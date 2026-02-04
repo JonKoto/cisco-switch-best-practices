@@ -1,0 +1,10 @@
+body {
+    padding-top: 1rem;
+}
+.severity-critical { color: #fff; background-color: #dc3545; }
+.severity-high { color: #fff; background-color: #fd7e14; }
+.severity-medium { color: #212529; background-color: #ffc107; }
+.severity-low { color: #fff; background-color: #6c757d; }
+.card-summary {
+    min-width: 120px;
+}

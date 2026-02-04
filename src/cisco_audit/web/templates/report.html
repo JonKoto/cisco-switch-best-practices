@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Report #{{ record.id }} - Cisco Audit{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center">
+    <h2>Audit Report #{{ record.id }}</h2>
+    <form method="post" action="{{ url_for('main.delete_report', record_id=record.id) }}"
+          onsubmit="return confirm('Delete this audit record?');">
+        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+    </form>
+</div>
+
+<table class="table table-bordered mt-3" style="max-width: 500px;">
+    <tr><th>Hostname</th><td>{{ record.hostname }}</td></tr>
+    <tr><th>Source</th><td>{{ record.source }} ({{ record.source_detail }})</td></tr>
+    <tr><th>Timestamp</th><td>{{ record.timestamp.strftime('%Y-%m-%d %H:%M UTC') }}</td></tr>
+    <tr><th>Total Findings</th><td>{{ record.count_total }}</td></tr>
+</table>
+
+<div class="d-flex gap-2 mb-4">
+    <span class="badge card-summary severity-critical">Critical: {{ record.count_critical }}</span>
+    <span class="badge card-summary severity-high">High: {{ record.count_high }}</span>
+    <span class="badge card-summary severity-medium">Medium: {{ record.count_medium }}</span>
+    <span class="badge card-summary severity-low">Low: {{ record.count_low }}</span>
+</div>
+
+{% if record.findings %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Rule</th>
+            <th>Severity</th>
+            <th>Description</th>
+            <th>Remediation</th>
+            <th>Config Line</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for f in record.findings %}
+        <tr>
+            <td>{{ f.rule_id }}</td>
+            <td><span class="badge severity-{{ f.severity | lower }}">{{ f.severity }}</span></td>
+            <td>{{ f.description }}</td>
+            <td>{{ f.remediation }}</td>
+            <td>{{ f.config_line or '' }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="text-success">No findings. Configuration is compliant.</p>
+{% endif %}
+{% endblock %}

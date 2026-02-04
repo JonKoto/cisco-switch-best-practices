@@ -141,3 +141,22 @@ def ssh(
 
     if report.findings:
         sys.exit(1)
+
+
+@cli.command()
+@click.option("--host", default="127.0.0.1", help="Host to bind to")
+@click.option("--port", default=5000, type=int, help="Port to bind to")
+@click.option("--debug", is_flag=True, help="Enable debug mode")
+def web(host: str, port: int, debug: bool):
+    """Launch the web interface."""
+    try:
+        from cisco_audit.web import create_app
+    except ImportError:
+        click.echo(
+            "Web dependencies not installed. Run: pip install cisco-audit[web]",
+            err=True,
+        )
+        sys.exit(1)
+
+    app = create_app()
+    app.run(host=host, port=port, debug=debug)

@@ -8,6 +8,12 @@ A Python CLI tool and library that audits Cisco IOS/IOS-XE switch configurations
 pip install -e ".[dev]"
 ```
 
+To include web interface dependencies:
+
+```bash
+pip install -e ".[web]"
+```
+
 ## Usage
 
 ### Audit a configuration file
@@ -24,6 +30,15 @@ cisco-audit file path/to/config.cfg --rules security --rules management
 cisco-audit ssh 192.168.1.1 -u admin -p
 cisco-audit ssh 192.168.1.1 -u admin -p --format json
 ```
+
+### Launch the web interface
+
+```bash
+cisco-audit web
+cisco-audit web --port 8080 --debug
+```
+
+The web UI is available at `http://127.0.0.1:5000` and provides file upload, SSH audit, and audit history with a SQLite backend.
 
 ## Rules
 

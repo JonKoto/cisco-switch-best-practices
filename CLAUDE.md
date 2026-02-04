@@ -13,7 +13,8 @@
 - `src/cisco_audit/parser.py` — ciscoconfparse2 wrapper
 - `src/cisco_audit/auditor.py` — Orchestrates rules against parsed configs
 - `src/cisco_audit/connector.py` — Netmiko SSH connector
-- `src/cisco_audit/cli.py` — Click CLI (`cisco-audit file` / `cisco-audit ssh`)
+- `src/cisco_audit/cli.py` — Click CLI (`cisco-audit file` / `cisco-audit ssh` / `cisco-audit web`)
+- `src/cisco_audit/web/` — Flask web frontend (app factory, SQLAlchemy models, routes, templates)
 
 ## Adding a New Rule
 1. Create a class in the appropriate rules module (security.py, management.py, network.py)

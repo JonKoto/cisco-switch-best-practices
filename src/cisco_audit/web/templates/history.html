@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Audit History - Cisco Audit{% endblock %}
+{% block content %}
+<h2>Audit History</h2>
+
+{% if pagination.items %}
+<table class="table table-striped mt-3">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Hostname</th>
+            <th>Source</th>
+            <th>Timestamp</th>
+            <th>Findings</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for audit in pagination.items %}
+        <tr>
+            <td>{{ audit.id }}</td>
+            <td>{{ audit.hostname }}</td>
+            <td>{{ audit.source }} ({{ audit.source_detail }})</td>
+            <td>{{ audit.timestamp.strftime('%Y-%m-%d %H:%M UTC') }}</td>
+            <td>{{ audit.count_total }}</td>
+            <td><a href="{{ url_for('main.report', record_id=audit.id) }}"
+                   class="btn btn-sm btn-outline-primary">View</a></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% if pagination.pages > 1 %}
+<nav>
+    <ul class="pagination">
+        {% if pagination.has_prev %}
+        <li class="page-item">
+            <a class="page-link"
+               href="{{ url_for('main.history', page=pagination.prev_num) }}">Previous</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">Previous</span></li>
+        {% endif %}
+
+        {% for p in pagination.iter_pages() %}
+            {% if p %}
+            <li class="page-item {{ 'active' if p == pagination.page else '' }}">
+                <a class="page-link" href="{{ url_for('main.history', page=p) }}">{{ p }}</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">...</span></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if pagination.has_next %}
+        <li class="page-item">
+            <a class="page-link"
+               href="{{ url_for('main.history', page=pagination.next_num) }}">Next</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">Next</span></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+{% else %}
+<p class="text-muted mt-3">No audit records found.</p>
+{% endif %}
+{% endblock %}
