@@ -1,0 +1,2 @@
+[console_scripts]
+cisco-audit = cisco_audit.cli:cli
