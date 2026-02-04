@@ -24,7 +24,8 @@ def create_app(config: dict | None = None) -> Flask:
         db_path = os.environ.get("CISCO_AUDIT_DB", str(db_dir / "history.db"))
         app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 
-    app.config.setdefault("SECRET_KEY", "cisco-audit-dev-key")
+    if not app.config.get("SECRET_KEY"):
+        app.config["SECRET_KEY"] = "cisco-audit-dev-key"
 
     db.init_app(app)
 
