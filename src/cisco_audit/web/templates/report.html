@@ -1,52 +1,272 @@
 {% extends "base.html" %}
 {% block title %}Report #{{ record.id }} - Cisco Audit{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center">
-    <h2>Audit Report #{{ record.id }}</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Audit Report #{{ record.id }}</h2>
     <form method="post" action="{{ url_for('main.delete_report', record_id=record.id) }}"
           onsubmit="return confirm('Delete this audit record?');">
-        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+        <button type="submit" class="btn btn-sm btn-outline-danger">
+            <i class="bi bi-trash"></i> Delete
+        </button>
     </form>
 </div>
 
-<table class="table table-bordered mt-3" style="max-width: 500px;">
-    <tr><th>Hostname</th><td>{{ record.hostname }}</td></tr>
-    <tr><th>Source</th><td>{{ record.source }} ({{ record.source_detail }})</td></tr>
-    <tr><th>Timestamp</th><td>{{ record.timestamp.strftime('%Y-%m-%d %H:%M UTC') }}</td></tr>
-    <tr><th>Total Findings</th><td>{{ record.count_total }}</td></tr>
-</table>
+<!-- ── Top Section: Meta + Gauge ─────────────────────────── -->
+<div class="row g-4 mb-4">
+    <div class="col-md-8">
+        <div class="meta-card">
+            <table class="table table-borderless mb-0">
+                <tr><th>Hostname</th><td>{{ record.hostname }}</td></tr>
+                <tr><th>Source</th><td>{{ record.source }} ({{ record.source_detail }})</td></tr>
+                <tr>
+                    <th>Timestamp</th>
+                    <td>{{ record.timestamp.strftime('%Y-%m-%d %H:%M UTC') }}</td>
+                </tr>
+                <tr><th>Total Findings</th><td>{{ record.count_total }}</td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-4 d-flex justify-content-center align-items-center">
+        <div class="score-ring" data-total="{{ record.count_total }}" data-rules="14">
+            <svg width="120" height="120" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="52" fill="none" stroke="#e9ecef"
+                        stroke-width="12"/>
+                <circle cx="60" cy="60" r="52" fill="none"
+                        stroke="#198754" stroke-width="12"
+                        stroke-linecap="round"
+                        stroke-dasharray="326.73"
+                        stroke-dashoffset="326.73"
+                        class="score-arc"/>
+            </svg>
+            <div class="score-label mt-2">--</div>
+            <div class="score-sub">Compliance</div>
+        </div>
+    </div>
+</div>
 
-<div class="d-flex gap-2 mb-4">
-    <span class="badge card-summary severity-critical">Critical: {{ record.count_critical }}</span>
-    <span class="badge card-summary severity-high">High: {{ record.count_high }}</span>
-    <span class="badge card-summary severity-medium">Medium: {{ record.count_medium }}</span>
-    <span class="badge card-summary severity-low">Low: {{ record.count_low }}</span>
+<!-- ── Summary Cards ─────────────────────────────────────── -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="summary-card critical" data-filter="CRITICAL">
+            <i class="bi bi-exclamation-octagon-fill card-icon"></i>
+            <div class="card-count">{{ record.count_critical }}</div>
+            <div class="card-label">Critical</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="summary-card high" data-filter="HIGH">
+            <i class="bi bi-exclamation-triangle-fill card-icon"></i>
+            <div class="card-count">{{ record.count_high }}</div>
+            <div class="card-label">High</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="summary-card medium" data-filter="MEDIUM">
+            <i class="bi bi-exclamation-circle-fill card-icon"></i>
+            <div class="card-count">{{ record.count_medium }}</div>
+            <div class="card-label">Medium</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="summary-card low" data-filter="LOW">
+            <i class="bi bi-info-circle-fill card-icon"></i>
+            <div class="card-count">{{ record.count_low }}</div>
+            <div class="card-label">Low</div>
+        </div>
+    </div>
 </div>
 
 {% if record.findings %}
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Rule</th>
-            <th>Severity</th>
-            <th>Description</th>
-            <th>Remediation</th>
-            <th>Config Line</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for f in record.findings %}
-        <tr>
-            <td>{{ f.rule_id }}</td>
-            <td><span class="badge severity-{{ f.severity | lower }}">{{ f.severity }}</span></td>
-            <td>{{ f.description }}</td>
-            <td>{{ f.remediation }}</td>
-            <td>{{ f.config_line or '' }}</td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+<!-- ── Filter Bar ────────────────────────────────────────── -->
+<div class="filter-bar mb-3" id="filterBar">
+    <span class="filter-badge active severity-critical" data-sev="CRITICAL">
+        <i class="bi bi-circle-fill" style="font-size:.5rem"></i> Critical
+    </span>
+    <span class="filter-badge active severity-high" data-sev="HIGH">
+        <i class="bi bi-circle-fill" style="font-size:.5rem"></i> High
+    </span>
+    <span class="filter-badge active severity-medium" data-sev="MEDIUM">
+        <i class="bi bi-circle-fill" style="font-size:.5rem"></i> Medium
+    </span>
+    <span class="filter-badge active severity-low" data-sev="LOW">
+        <i class="bi bi-circle-fill" style="font-size:.5rem"></i> Low
+    </span>
+    <span class="filter-badge active bg-dark text-white" data-sev="ALL">All</span>
+    <span class="ms-auto filter-counter" id="filterCounter"></span>
+    <select class="form-select form-select-sm" style="width:auto" id="sortSelect">
+        <option value="sev-desc">Severity (High first)</option>
+        <option value="sev-asc">Severity (Low first)</option>
+        <option value="rule-asc">Rule ID (A-Z)</option>
+    </select>
+</div>
+
+<!-- ── Findings Table ────────────────────────────────────── -->
+<div class="findings-table">
+    <table class="table table-striped" id="findingsTable">
+        <thead>
+            <tr>
+                <th data-sort="rule">Rule <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                <th data-sort="sev">Severity <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                <th>Description</th>
+                <th>Remediation</th>
+                <th>Config Line</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for f in record.findings %}
+            {% set sev = f.severity | upper %}
+            {% set sev_order = {'CRITICAL': 1, 'HIGH': 2, 'MEDIUM': 3, 'LOW': 4} %}
+            <tr data-severity="{{ sev }}"
+                data-severity-order="{{ sev_order.get(sev, 9) }}"
+                class="border-sev-{{ sev | lower }}">
+                <td>{{ f.rule_id }}</td>
+                <td>
+                    <span class="badge severity-{{ f.severity | lower }}">
+                        {{ f.severity }}
+                    </span>
+                </td>
+                <td>{{ f.description }}</td>
+                <td>{{ f.remediation }}</td>
+                <td>{% if f.config_line %}<code>{{ f.config_line }}</code>{% endif %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% else %}
-<p class="text-success">No findings. Configuration is compliant.</p>
+<div class="findings-table p-4 text-center">
+    <i class="bi bi-check-circle-fill text-success" style="font-size:3rem"></i>
+    <p class="text-success mt-2 mb-0 fs-5">No findings. Configuration is compliant.</p>
+</div>
 {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    /* ── Compliance Gauge ──────────────────────────────────── */
+    var ring = document.querySelector('.score-ring');
+    if (ring) {
+        var total = parseInt(ring.dataset.total, 10);
+        var rules = parseInt(ring.dataset.rules, 10);
+        var pct = Math.max(0, Math.round(((rules - total) / rules) * 100));
+        var circumference = 2 * Math.PI * 52;  /* r=52 */
+        var offset = circumference - (pct / 100) * circumference;
+        var arc = ring.querySelector('.score-arc');
+        var color = pct >= 80 ? '#198754' : pct >= 50 ? '#ffc107' : '#dc3545';
+        arc.style.stroke = color;
+        arc.style.strokeDashoffset = offset;
+        ring.querySelector('.score-label').textContent = pct + '%';
+    }
+
+    /* ── Filter & Sort Logic ───────────────────────────────── */
+    var tbody = document.querySelector('#findingsTable tbody');
+    if (!tbody) return;
+    var rows = Array.from(tbody.querySelectorAll('tr'));
+    var badges = document.querySelectorAll('#filterBar .filter-badge');
+    var counter = document.getElementById('filterCounter');
+    var sortSelect = document.getElementById('sortSelect');
+    var activeFilters = new Set(['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']);
+
+    function applyFilter() {
+        var shown = 0;
+        rows.forEach(function (row) {
+            var sev = row.getAttribute('data-severity');
+            if (activeFilters.has(sev)) {
+                row.classList.remove('finding-hidden');
+                shown++;
+            } else {
+                row.classList.add('finding-hidden');
+            }
+        });
+        counter.textContent = 'Showing ' + shown + ' of ' + rows.length + ' findings';
+    }
+
+    function applySort(mode) {
+        rows.sort(function (a, b) {
+            if (mode === 'sev-desc') {
+                return parseInt(a.dataset.severityOrder) - parseInt(b.dataset.severityOrder);
+            } else if (mode === 'sev-asc') {
+                return parseInt(b.dataset.severityOrder) - parseInt(a.dataset.severityOrder);
+            } else {
+                return a.children[0].textContent.localeCompare(b.children[0].textContent);
+            }
+        });
+        rows.forEach(function (row) { tbody.appendChild(row); });
+    }
+
+    /* Badge click handlers */
+    badges.forEach(function (badge) {
+        badge.addEventListener('click', function () {
+            var sev = badge.dataset.sev;
+            if (sev === 'ALL') {
+                activeFilters = new Set(['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']);
+                badges.forEach(function (b) { b.classList.add('active'); b.classList.remove('inactive'); });
+            } else {
+                /* Toggle individual severity */
+                if (activeFilters.has(sev)) {
+                    activeFilters.delete(sev);
+                    badge.classList.remove('active');
+                    badge.classList.add('inactive');
+                } else {
+                    activeFilters.add(sev);
+                    badge.classList.add('active');
+                    badge.classList.remove('inactive');
+                }
+                /* Update "All" badge state */
+                var allBadge = document.querySelector('[data-sev="ALL"]');
+                if (activeFilters.size === 4) {
+                    allBadge.classList.add('active');
+                    allBadge.classList.remove('inactive');
+                } else {
+                    allBadge.classList.remove('active');
+                    allBadge.classList.add('inactive');
+                }
+            }
+            applyFilter();
+        });
+    });
+
+    /* Summary card click → solo filter */
+    document.querySelectorAll('.summary-card[data-filter]').forEach(function (card) {
+        card.addEventListener('click', function () {
+            var sev = card.dataset.filter;
+            activeFilters = new Set([sev]);
+            badges.forEach(function (b) {
+                if (b.dataset.sev === sev) {
+                    b.classList.add('active');
+                    b.classList.remove('inactive');
+                } else {
+                    b.classList.remove('active');
+                    b.classList.add('inactive');
+                }
+            });
+            applyFilter();
+        });
+    });
+
+    /* Sort dropdown */
+    sortSelect.addEventListener('change', function () {
+        applySort(sortSelect.value);
+    });
+
+    /* Column header sorting */
+    document.querySelectorAll('#findingsTable thead th[data-sort]').forEach(function (th) {
+        th.addEventListener('click', function () {
+            var key = th.dataset.sort;
+            if (key === 'sev') {
+                var cur = sortSelect.value;
+                sortSelect.value = cur === 'sev-desc' ? 'sev-asc' : 'sev-desc';
+            } else if (key === 'rule') {
+                sortSelect.value = 'rule-asc';
+            }
+            applySort(sortSelect.value);
+        });
+    });
+
+    /* Initial state */
+    applyFilter();
+    applySort('sev-desc');
+})();
+</script>
 {% endblock %}

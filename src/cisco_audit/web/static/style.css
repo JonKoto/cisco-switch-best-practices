@@ -1,10 +1,220 @@
-body {
-    padding-top: 1rem;
+/* ── Custom Properties ─────────────────────────────────────── */
+:root {
+    --clr-critical: #dc3545;
+    --clr-high: #fd7e14;
+    --clr-medium: #ffc107;
+    --clr-low: #6c757d;
+    --clr-success: #198754;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, .08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, .1);
+    --radius: .5rem;
 }
-.severity-critical { color: #fff; background-color: #dc3545; }
-.severity-high { color: #fff; background-color: #fd7e14; }
-.severity-medium { color: #212529; background-color: #ffc107; }
-.severity-low { color: #fff; background-color: #6c757d; }
-.card-summary {
-    min-width: 120px;
+
+/* ── Base ──────────────────────────────────────────────────── */
+body {
+    background-color: #f8f9fa;
+}
+
+/* ── Severity badges (kept for backwards compat) ──────────── */
+.severity-critical { color: #fff; background-color: var(--clr-critical); }
+.severity-high     { color: #fff; background-color: var(--clr-high); }
+.severity-medium   { color: #212529; background-color: var(--clr-medium); }
+.severity-low      { color: #fff; background-color: var(--clr-low); }
+.card-summary      { min-width: 120px; }
+
+/* ── Summary Cards (report page) ──────────────────────────── */
+.summary-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform .15s ease, box-shadow .15s ease;
+    cursor: pointer;
+}
+.summary-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+.summary-card .card-icon {
+    position: absolute;
+    right: .75rem;
+    top: .75rem;
+    font-size: 2rem;
+    opacity: .15;
+}
+.summary-card .card-count {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+}
+.summary-card .card-label {
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-top: .25rem;
+}
+.summary-card.critical { border-top: 3px solid var(--clr-critical); }
+.summary-card.critical .card-icon { color: var(--clr-critical); }
+.summary-card.high     { border-top: 3px solid var(--clr-high); }
+.summary-card.high .card-icon     { color: var(--clr-high); }
+.summary-card.medium   { border-top: 3px solid var(--clr-medium); }
+.summary-card.medium .card-icon   { color: var(--clr-medium); }
+.summary-card.low      { border-top: 3px solid var(--clr-low); }
+.summary-card.low .card-icon      { color: var(--clr-low); }
+
+/* ── Compliance Gauge ─────────────────────────────────────── */
+.score-ring {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.score-ring svg {
+    transform: rotate(-90deg);
+}
+.score-ring .score-label {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+.score-ring .score-sub {
+    font-size: .85rem;
+    color: #6c757d;
+}
+
+/* ── Filter Bar ───────────────────────────────────────────── */
+.filter-bar {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: .75rem 1rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+.filter-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .25rem;
+    padding: .35rem .75rem;
+    border-radius: 1rem;
+    font-size: .8rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: opacity .15s, border-color .15s;
+    user-select: none;
+}
+.filter-badge.inactive {
+    opacity: .4;
+}
+.filter-badge.active {
+    opacity: 1;
+    border-color: rgba(0, 0, 0, .25);
+}
+.filter-counter {
+    font-size: .85rem;
+    color: #6c757d;
+}
+
+/* ── Findings Table ───────────────────────────────────────── */
+.findings-table {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+.findings-table table {
+    margin-bottom: 0;
+}
+.findings-table thead th {
+    background: #f8f9fa;
+    text-transform: uppercase;
+    font-size: .75rem;
+    letter-spacing: .05em;
+    color: #6c757d;
+    border-bottom: 2px solid #dee2e6;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+.findings-table thead th:hover {
+    color: #212529;
+}
+.findings-table thead th .sort-icon {
+    font-size: .65rem;
+    margin-left: .25rem;
+}
+.findings-table tbody tr {
+    transition: background-color .1s;
+}
+.findings-table tbody tr:hover {
+    background-color: #f1f3f5;
+}
+.findings-table tbody tr.border-sev-critical { border-left: 3px solid var(--clr-critical); }
+.findings-table tbody tr.border-sev-high     { border-left: 3px solid var(--clr-high); }
+.findings-table tbody tr.border-sev-medium   { border-left: 3px solid var(--clr-medium); }
+.findings-table tbody tr.border-sev-low      { border-left: 3px solid var(--clr-low); }
+.findings-table tbody td code {
+    background: #f1f3f5;
+    padding: .15rem .4rem;
+    border-radius: .25rem;
+    font-size: .85em;
+}
+.finding-hidden { display: none; }
+
+/* ── Action Cards (dashboard) ─────────────────────────────── */
+.action-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+.action-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+.action-card .card-body {
+    text-align: center;
+    padding: 2rem 1.5rem;
+}
+.action-card .action-icon {
+    font-size: 2.5rem;
+    margin-bottom: .75rem;
+    color: #0d6efd;
+}
+
+/* ── Form Container (upload / ssh) ────────────────────────── */
+.form-container {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 2rem;
+    max-width: 540px;
+}
+
+/* ── Report Meta Card ─────────────────────────────────────── */
+.meta-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 1.25rem 1.5rem;
+}
+.meta-card th {
+    color: #6c757d;
+    font-weight: 600;
+    padding-right: 1rem;
+    white-space: nowrap;
+}
+
+/* ── History Table Card ───────────────────────────────────── */
+.table-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+.table-card table {
+    margin-bottom: 0;
 }

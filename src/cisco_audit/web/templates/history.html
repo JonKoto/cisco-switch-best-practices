@@ -4,34 +4,36 @@
 <h2>Audit History</h2>
 
 {% if pagination.items %}
-<table class="table table-striped mt-3">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Hostname</th>
-            <th>Source</th>
-            <th>Timestamp</th>
-            <th>Findings</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for audit in pagination.items %}
-        <tr>
-            <td>{{ audit.id }}</td>
-            <td>{{ audit.hostname }}</td>
-            <td>{{ audit.source }} ({{ audit.source_detail }})</td>
-            <td>{{ audit.timestamp.strftime('%Y-%m-%d %H:%M UTC') }}</td>
-            <td>{{ audit.count_total }}</td>
-            <td><a href="{{ url_for('main.report', record_id=audit.id) }}"
-                   class="btn btn-sm btn-outline-primary">View</a></td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+<div class="table-card mt-3">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Hostname</th>
+                <th>Source</th>
+                <th>Timestamp</th>
+                <th>Findings</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for audit in pagination.items %}
+            <tr>
+                <td>{{ audit.id }}</td>
+                <td>{{ audit.hostname }}</td>
+                <td>{{ audit.source }} ({{ audit.source_detail }})</td>
+                <td>{{ audit.timestamp.strftime('%Y-%m-%d %H:%M UTC') }}</td>
+                <td>{{ audit.count_total }}</td>
+                <td><a href="{{ url_for('main.report', record_id=audit.id) }}"
+                       class="btn btn-sm btn-outline-primary">View</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 {% if pagination.pages > 1 %}
-<nav>
+<nav class="d-flex justify-content-center mt-4">
     <ul class="pagination">
         {% if pagination.has_prev %}
         <li class="page-item">

@@ -2,52 +2,71 @@
 {% block title %}Dashboard - Cisco Audit{% endblock %}
 {% block content %}
 <h2>Dashboard</h2>
-<div class="row mt-4 mb-4">
+<div class="row mt-4 mb-4 g-4">
     <div class="col-md-6">
-        <div class="card">
+        <div class="card action-card">
             <div class="card-body">
+                <div class="action-icon"><i class="bi bi-upload"></i></div>
                 <h5 class="card-title">Upload Config File</h5>
-                <p class="card-text">Audit a local IOS/IOS-XE configuration file.</p>
-                <a href="{{ url_for('main.upload_form') }}" class="btn btn-primary">Upload</a>
+                <p class="card-text text-muted">
+                    Audit a local IOS/IOS-XE configuration file.
+                </p>
+                <a href="{{ url_for('main.upload_form') }}"
+                   class="btn btn-primary">Upload</a>
             </div>
         </div>
     </div>
     <div class="col-md-6">
-        <div class="card">
+        <div class="card action-card">
             <div class="card-body">
+                <div class="action-icon"><i class="bi bi-terminal"></i></div>
                 <h5 class="card-title">SSH Audit</h5>
-                <p class="card-text">Connect to a live device and audit its running config.</p>
-                <a href="{{ url_for('main.ssh_form') }}" class="btn btn-primary">Connect</a>
+                <p class="card-text text-muted">
+                    Connect to a live device and audit its running config.
+                </p>
+                <a href="{{ url_for('main.ssh_form') }}"
+                   class="btn btn-primary">Connect</a>
             </div>
         </div>
     </div>
 </div>
 
-<h4>Recent Audits</h4>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">Recent Audits</h4>
+    {% if audits %}
+    <a href="{{ url_for('main.history') }}" class="btn btn-sm btn-outline-secondary">
+        View All <i class="bi bi-arrow-right"></i>
+    </a>
+    {% endif %}
+</div>
 {% if audits %}
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Hostname</th>
-            <th>Source</th>
-            <th>Timestamp</th>
-            <th>Findings</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for audit in audits %}
-        <tr>
-            <td>{{ audit.hostname }}</td>
-            <td>{{ audit.source }} ({{ audit.source_detail }})</td>
-            <td>{{ audit.timestamp.strftime('%Y-%m-%d %H:%M UTC') }}</td>
-            <td>{{ audit.count_total }}</td>
-            <td><a href="{{ url_for('main.report', record_id=audit.id) }}"
-                   class="btn btn-sm btn-outline-primary">View</a></td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+<div class="table-card">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Hostname</th>
+                <th>Source</th>
+                <th>Timestamp</th>
+                <th>Findings</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for audit in audits %}
+            <tr>
+                <td>{{ audit.hostname }}</td>
+                <td>{{ audit.source }} ({{ audit.source_detail }})</td>
+                <td>{{ audit.timestamp.strftime('%Y-%m-%d %H:%M UTC') }}</td>
+                <td>{{ audit.count_total }}</td>
+                <td>
+                    <a href="{{ url_for('main.report', record_id=audit.id) }}"
+                       class="btn btn-sm btn-outline-primary">View</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% else %}
 <p class="text-muted">No audits yet. Upload a config file or connect via SSH to get started.</p>
 {% endif %}

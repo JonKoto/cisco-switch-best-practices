@@ -1,13 +1,20 @@
 {% extends "base.html" %}
 {% block title %}Upload Config - Cisco Audit{% endblock %}
 {% block content %}
-<h2>Upload Configuration File</h2>
-<form method="post" enctype="multipart/form-data" class="mt-4" style="max-width: 500px;">
-    <div class="mb-3">
-        <label for="config_file" class="form-label">Configuration file (.cfg, .txt)</label>
-        <input type="file" class="form-control" id="config_file" name="config_file" required>
-    </div>
-    <button type="submit" class="btn btn-primary">Audit</button>
-    <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Cancel</a>
-</form>
+<h2><i class="bi bi-upload"></i> Upload Configuration File</h2>
+<div class="form-container mt-4">
+    <form method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="config_file" class="form-label">
+                Configuration file (.cfg, .txt)
+            </label>
+            <input type="file" class="form-control" id="config_file"
+                   name="config_file" required>
+        </div>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-search"></i> Audit
+        </button>
+        <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
 {% endblock %}

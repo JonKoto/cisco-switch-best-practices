@@ -1,30 +1,34 @@
 {% extends "base.html" %}
 {% block title %}SSH Audit - Cisco Audit{% endblock %}
 {% block content %}
-<h2>SSH Audit</h2>
-<form method="post" class="mt-4" style="max-width: 500px;">
-    <div class="mb-3">
-        <label for="host" class="form-label">Host</label>
-        <input type="text" class="form-control" id="host" name="host"
-               placeholder="192.168.1.1" required>
-    </div>
-    <div class="mb-3">
-        <label for="port" class="form-label">Port</label>
-        <input type="number" class="form-control" id="port" name="port" value="22">
-    </div>
-    <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
-        <input type="text" class="form-control" id="username" name="username" required>
-    </div>
-    <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <input type="password" class="form-control" id="password" name="password" required>
-    </div>
-    <div class="mb-3">
-        <label for="enable_secret" class="form-label">Enable Secret (optional)</label>
-        <input type="password" class="form-control" id="enable_secret" name="enable_secret">
-    </div>
-    <button type="submit" class="btn btn-primary">Audit</button>
-    <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Cancel</a>
-</form>
+<h2><i class="bi bi-terminal"></i> SSH Audit</h2>
+<div class="form-container mt-4">
+    <form method="post">
+        <div class="mb-3">
+            <label for="host" class="form-label">Host</label>
+            <input type="text" class="form-control" id="host" name="host"
+                   placeholder="192.168.1.1" required>
+        </div>
+        <div class="mb-3">
+            <label for="port" class="form-label">Port</label>
+            <input type="number" class="form-control" id="port" name="port" value="22">
+        </div>
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" id="username" name="username" required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <div class="mb-3">
+            <label for="enable_secret" class="form-label">Enable Secret (optional)</label>
+            <input type="password" class="form-control" id="enable_secret" name="enable_secret">
+        </div>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-search"></i> Audit
+        </button>
+        <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
 {% endblock %}
